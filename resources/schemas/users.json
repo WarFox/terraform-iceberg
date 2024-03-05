@@ -1,0 +1,24 @@
+{
+  "type": "record",
+  "name": "users",
+  "namespace": "example.users",
+  "public_name": "users",
+  "description": "Users schema",
+  "fields": [
+    {
+      "name": "id",
+      "type": "string",
+      "description": "Identifier"
+    },
+    {
+      "name": "name",
+      "type": "string",
+      "description": "Name of the user"
+    },
+    {
+      "name": "country",
+      "type": "string",
+      "description": "Country id"
+    },
+   ]
+}
