@@ -1,9 +1,9 @@
 {
   "type": "record",
-  "name": "users",
-  "namespace": "example.users",
-  "public_name": "users",
-  "description": "Users schema",
+  "name": "iceberg_table",
+  "namespace": "example.iceberg_table",
+  "public_name": "iceberg_table",
+  "description": "Sample schema",
   "fields": [
     {
       "name": "id",
@@ -13,12 +13,12 @@
     {
       "name": "name",
       "type": "string",
-      "description": "Name of the user"
+      "description": "Name of the record"
     },
     {
       "name": "country",
       "type": "string",
       "description": "Country id"
-    },
+    }
    ]
 }
