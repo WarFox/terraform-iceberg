@@ -1,4 +1,0 @@
-#+title: Terraform Iceberg
-
-Setup iceberg tables with terraform
-
