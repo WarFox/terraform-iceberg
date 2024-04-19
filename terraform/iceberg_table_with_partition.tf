@@ -8,6 +8,23 @@ locals {
   region     = data.aws_region.current.name
 }
 
+# create a local file for each file in the resources/ddl folder
+resource "local_file" "drop_table_files" {
+  for_each = {
+    for filename in fileset("../resources/ddl/", "*.sql") : trimsuffix(filename, ".sql") => filemd5("../resources/ddl/${filename}")
+  }
+
+  content = templatefile("./bin/drop_table.sh.tpl", {
+    table_name    = each.key,
+    database_name = "iceberg_db",
+    account_id    = local.account_id,
+    region        = local.region
+  })
+
+  # create new executable file for each table
+  filename = "./bin/drop_table_${each.key}.sh"
+}
+
 resource "null_resource" "iceberg_table_with_partition" {
   # for each file in the resources/ddl folder, make a map of filename => ../resources/ddl/filename.sql
   for_each = {
@@ -33,12 +50,9 @@ resource "null_resource" "iceberg_table_with_partition" {
 
   provisioner "local-exec" {
     when    = destroy
-    command = <<EOF
-    aws athena start-query-execution \
-      --output json \
-      --query-string "DROP TABLE IF EXISTS ${each.key};" \
-      --query-execution-context "Database=iceberg_db" \
-      --result-configuration "OutputLocation=s3://aws-athena-query-results-bucket" # only reference attributes of the related resource, via 'self', 'count.index', or 'each.key'
-EOF
+    command = "./bin/drop_table_${each.key}.sh"
   }
+
+  depends_on = [local_file.drop_table_files]
+
 }
