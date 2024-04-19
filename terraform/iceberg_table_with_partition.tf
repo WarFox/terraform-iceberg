@@ -14,7 +14,7 @@ resource "local_file" "drop_table_files" {
     for filename in fileset("../resources/ddl/", "*.sql") : trimsuffix(filename, ".sql") => filemd5("../resources/ddl/${filename}")
   }
 
-  content = templatefile("./bin/drop_table.sh.tpl", {
+  content = templatefile("../bin/drop_table.sh.tpl", {
     table_name    = each.key,
     database_name = "iceberg_db",
     account_id    = local.account_id,
@@ -22,7 +22,7 @@ resource "local_file" "drop_table_files" {
   })
 
   # create new executable file for each table
-  filename = "./bin/drop_table_${each.key}.sh"
+  filename = "../bin/tmp_drop_table_${each.key}.sh"
 }
 
 resource "null_resource" "iceberg_table_with_partition" {
@@ -37,7 +37,7 @@ resource "null_resource" "iceberg_table_with_partition" {
   }
 
   provisioner "local-exec" {
-    command = "./bin/create_table.sh"
+    command = "../bin/create_table.sh"
 
     # environtment variables are available in the script
     environment = {
@@ -50,7 +50,7 @@ resource "null_resource" "iceberg_table_with_partition" {
 
   provisioner "local-exec" {
     when    = destroy
-    command = "./bin/drop_table_${each.key}.sh"
+    command = "../bin/tmp_drop_table_${each.key}.sh"
   }
 
   depends_on = [local_file.drop_table_files]
